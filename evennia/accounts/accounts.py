@@ -942,18 +942,19 @@ class DefaultAccount(AccountDB, metaclass=TypeclassBase):
         character_permissions = kwargs.pop("permissions", self.permissions)
 
         # Load the appropriate Character class
-        character_typeclass = kwargs.pop("typeclass", self.default_character_typeclass)
-        Character = class_from_module(character_typeclass)
+        typeclass = kwargs.pop("typeclass", self.default_character_typeclass)
+        if isinstance(typeclass, str):
+            typeclass = class_from_module(typeclass)
 
         if "location" not in kwargs:
             kwargs["location"] = ObjectDB.objects.get_id(settings.START_LOCATION)
 
         # Create the character
-        character, errs = Character.create(
+        character, errs = typeclass.create(
             character_key,
             self,
             ip=character_ip,
-            typeclass=character_typeclass,
+            typeclass=typeclass,
             permissions=character_permissions,
             **kwargs,
         )
