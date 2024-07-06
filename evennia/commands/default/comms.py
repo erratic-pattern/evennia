@@ -723,7 +723,7 @@ class CmdChannel(COMMAND_DEFAULT_CLASS):
 
         who_list = []
         for subscriber in all_subs:
-            name = subscriber.get_display_name(caller)
+            name = subscriber.get_display_name(caller, session=self.session)
             conditions = (
                 "muting" if subscriber in mute_list else "",
                 "offline" if subscriber not in online_list else "",

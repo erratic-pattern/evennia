@@ -493,10 +493,10 @@ class CmdWho(COMMAND_DEFAULT_CLASS):
                 puppet = session.get_puppet()
                 location = puppet.location.key if puppet and puppet.location else "None"
                 table.add_row(
-                    utils.crop(session_account.get_display_name(account), width=25),
+                    utils.crop(session_account.get_display_name(account, session=self.session), width=25),
                     utils.time_format(delta_conn, 0),
                     utils.time_format(delta_cmd, 1),
-                    utils.crop(puppet.get_display_name(account) if puppet else "None", width=25),
+                    utils.crop(puppet.get_display_name(account, session=self.session) if puppet else "None", width=25),
                     utils.crop(location, width=25),
                     session.cmd_total,
                     session.protocol_key,
@@ -512,7 +512,7 @@ class CmdWho(COMMAND_DEFAULT_CLASS):
                 delta_conn = time.time() - session.conn_time
                 session_account = session.get_account()
                 table.add_row(
-                    utils.crop(session_account.get_display_name(account), width=25),
+                    utils.crop(session_account.get_display_name(account, session=self.session), width=25),
                     utils.time_format(delta_conn, 0),
                     utils.time_format(delta_cmd, 1),
                 )

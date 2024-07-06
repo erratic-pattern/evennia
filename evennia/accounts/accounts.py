@@ -385,13 +385,14 @@ class DefaultAccount(AccountDB, metaclass=TypeclassBase):
             return f"(#{self.id})"
         return ""
 
-    def get_display_name(self, looker, **kwargs):
+    def get_display_name(self, looker, session=None, **kwargs):
         """
         This is used by channels and other OOC communications methods to give a
         custom display of this account's input.
 
         Args:
             looker (Account): The one that will see this name.
+            session (Session, optional): The session that will see this name
             **kwargs: Unused by default, can be used to pass game-specific data.
 
         Returns:
@@ -502,7 +503,7 @@ class DefaultAccount(AccountDB, metaclass=TypeclassBase):
         # re-cache locks to make sure superuser bypass is updated
         obj.locks.cache_lock_bypass(obj)
         # final hook
-        obj.at_post_puppet()
+        obj.at_post_puppet(self, session=session)
         SIGNAL_OBJECT_POST_PUPPET.send(sender=obj, account=self, session=session)
 
     def unpuppet_object(self, session):
@@ -521,7 +522,7 @@ class DefaultAccount(AccountDB, metaclass=TypeclassBase):
             obj = session.puppet
             if obj:
                 # do the disconnect, but only if we are the last session to puppet
-                obj.at_pre_unpuppet()
+                obj.at_pre_unpuppet(self, session=session)
                 obj.sessions.remove(session)
                 if not obj.sessions.count():
                     del obj.account

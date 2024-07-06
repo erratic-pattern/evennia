@@ -829,7 +829,7 @@ class TypedObject(SharedMemoryModel):
         "Stop accidental deletion."
         raise Exception("Cannot delete the ndb object!")
 
-    def get_display_name(self, looker, **kwargs):
+    def get_display_name(self, looker, session=None, **kwargs):
         """
         Displays the name of the object in a viewer-aware manner.
 
@@ -837,6 +837,7 @@ class TypedObject(SharedMemoryModel):
             looker (TypedObject, optional): The object or account that is looking
                 at/getting inforamtion for this object. If not given, some
                 'safe' minimum level should be returned.
+            session (Session, optional): The session that will see this name
 
         Returns:
             name (str): A string containing the name of the object,

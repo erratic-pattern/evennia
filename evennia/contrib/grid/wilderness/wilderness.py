@@ -588,7 +588,7 @@ class WildernessRoom(DefaultRoom):
         # customise it
         self.wilderness.mapprovider.at_prepare_room(new_coordinates, obj, self)
 
-    def get_display_name(self, looker, **kwargs):
+    def get_display_name(self, looker, session=None, **kwargs):
         """
         Displays the name of the object in a viewer-aware manner.
         This is a core evennia hook.
@@ -596,6 +596,7 @@ class WildernessRoom(DefaultRoom):
         Args:
             looker (TypedObject): The object or account that is looking
                 at/getting inforamtion for this object.
+            session (Session, optional): The session that will see this name
 
         Returns:
             name (str): A string containing the name of the object,

@@ -292,7 +292,7 @@ class CmdMail(default_cmds.MuxAccountCommand):
                     if message:
                         messageForm.append(_HEAD_CHAR * _WIDTH)
                         messageForm.append(
-                            "|wFrom:|n %s" % (message.senders[0].get_display_name(self.caller))
+                            "|wFrom:|n %s" % (message.senders[0].get_display_name(self.caller, session=self.session))
                         )
                         # note that we cannot use %-d format here since Windows does not support it
                         day = message.db_date_created.day
@@ -332,7 +332,7 @@ class CmdMail(default_cmds.MuxAccountCommand):
 
                     table.add_row(
                         index,
-                        message.senders[0].get_display_name(self.caller),
+                        message.senders[0].get_display_name(self.caller, session=self.session),
                         message.header,
                         datetime_format(message.db_date_created),
                         status,

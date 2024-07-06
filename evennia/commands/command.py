@@ -521,7 +521,7 @@ Command \"{cmdname}\" has no defined `func()` method. Available properties on th
         """
         self.get_command_info()
 
-    def get_extra_info(self, caller, **kwargs):
+    def get_extra_info(self, caller, session=None, **kwargs):
         """
         Display some extra information that may help distinguish this
         command from others, for instance, in a disambiguity prompt.
@@ -533,6 +533,7 @@ Command \"{cmdname}\" has no defined `func()` method. Available properties on th
         Args:
             caller (TypedObject): The caller who typed an ambiguous
             term handed to the search function.
+            session (Session, optional): The session that will see this info
 
         Returns:
             A string with identifying information to disambiguate the
@@ -540,7 +541,7 @@ Command \"{cmdname}\" has no defined `func()` method. Available properties on th
 
         """
         if hasattr(self, "obj") and self.obj and self.obj != caller:
-            return " (%s)" % self.obj.get_display_name(caller).strip()
+            return " (%s)" % self.obj.get_display_name(caller, session=session).strip()
         return ""
 
     def get_help(self, caller, cmdset):

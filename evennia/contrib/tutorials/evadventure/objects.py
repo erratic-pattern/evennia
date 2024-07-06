@@ -194,7 +194,7 @@ class EvAdventureWeapon(EvAdventureObject):
     defense_type = AttributeProperty(Ability.ARMOR)
     damage_roll = AttributeProperty("1d6")
 
-    def get_display_name(self, looker=None, **kwargs):
+    def get_display_name(self, looker=None, session=None, **kwargs):
         quality = self.quality
 
         quality_txt = ""

@@ -275,7 +275,7 @@ class CmdSetObjAlias(COMMAND_DEFAULT_CLASS):
                 caller.msg(
                     "Aliases for %s: %s"
                     % (
-                        obj.get_display_name(caller),
+                        obj.get_display_name(caller, session=self.session),
                         ", ".join(
                             "'%s'%s"
                             % (alias, "" if category is None else "[category:'%s']" % category)
@@ -284,7 +284,7 @@ class CmdSetObjAlias(COMMAND_DEFAULT_CLASS):
                     )
                 )
             else:
-                caller.msg(f"No aliases exist for '{obj.get_display_name(caller)}'.")
+                caller.msg(f"No aliases exist for '{obj.get_display_name(caller, session=self.session)}'.")
             return
 
         if not (obj.access(caller, "control") or obj.access(caller, "edit")):
@@ -299,7 +299,7 @@ class CmdSetObjAlias(COMMAND_DEFAULT_CLASS):
             if old_aliases:
                 caller.msg(
                     "Cleared aliases from %s: %s"
-                    % (obj.get_display_name(caller), ", ".join(old_aliases))
+                    % (obj.get_display_name(caller, session=self.session), ", ".join(old_aliases))
                 )
                 obj.aliases.clear()
             else:
@@ -314,9 +314,9 @@ class CmdSetObjAlias(COMMAND_DEFAULT_CLASS):
                     obj.aliases.remove(key=self.rhs, category=category)
                     existed = True
             if existed:
-                caller.msg("Alias '%s' deleted from %s." % (self.rhs, obj.get_display_name(caller)))
+                caller.msg("Alias '%s' deleted from %s." % (self.rhs, obj.get_display_name(caller, session=self.session)))
             else:
-                caller.msg("%s has no alias '%s'." % (obj.get_display_name(caller), self.rhs))
+                caller.msg("%s has no alias '%s'." % (obj.get_display_name(caller, session=self.session), self.rhs))
             return
 
         category = None
@@ -352,7 +352,7 @@ class CmdSetObjAlias(COMMAND_DEFAULT_CLASS):
         caller.msg(
             "Alias(es) for '%s' set to '%s'%s."
             % (
-                obj.get_display_name(caller),
+                obj.get_display_name(caller, session=self.session),
                 str(obj.aliases),
                 " (category: '%s')" % category if category else "",
             )
@@ -800,7 +800,7 @@ class CmdDesc(COMMAND_DEFAULT_CLASS):
             desc = self.args
         if obj.access(self.caller, "control") or obj.access(self.caller, "edit"):
             obj.db.desc = desc
-            caller.msg(f"The description was set on {obj.get_display_name(caller)}.")
+            caller.msg(f"The description was set on {obj.get_display_name(caller, session=self.session)}.")
         else:
             caller.msg(f"You don't have permission to edit the description of {obj.key}.")
 
@@ -916,7 +916,7 @@ class CmdDestroy(COMMAND_DEFAULT_CLASS):
         if objs and ("force" not in self.switches and type(self).confirm):
             confirm = "Are you sure you want to destroy "
             if len(objs) == 1:
-                confirm += objs[0].get_display_name(caller)
+                confirm += objs[0].get_display_name(caller, session=self.session)
             elif len(objs) < 5:
                 confirm += ", ".join([obj.get_display_name(caller) for obj in objs])
             else:
@@ -3098,7 +3098,7 @@ class CmdExamine(ObjManipCommand):
             if not obj.access(self.caller, "examine"):
                 # If we don't have special info access, just look
                 # at the object instead.
-                self.msg(self.caller.at_look(obj))
+                self.msg(self.caller.at_look(obj, session=self.session))
                 continue
 
             if obj_attrs:
@@ -3289,7 +3289,7 @@ class CmdFind(COMMAND_DEFAULT_CLASS):
                 if "loc" in self.switches and not is_account and result.location:
                     string += (
                         f" (|wlocation|n: |g{result.location.get_display_name(caller)}"
-                        f"{result.get_extra_display_name_info(caller)}|n)"
+                        f"{result.location.get_extra_display_name_info(caller)}|n)"
                     )
         else:
             # Not an account/dbref search but a wider search; build a queryset.

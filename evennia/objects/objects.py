@@ -1440,13 +1440,14 @@ class DefaultObject(ObjectDB, metaclass=TypeclassBase):
 
     # name and return_appearance hooks
 
-    def get_display_name(self, looker=None, **kwargs):
+    def get_display_name(self, looker=None, session=None, **kwargs):
         """
         Displays the name of the object in a viewer-aware manner.
 
         Args:
             looker (DefaultObject): The object or account that is looking at or getting information
                 for this object.
+            session (Session, optional): The session that will see this name
 
         Returns:
             str: A name to display for this object. By default this returns the `.name` of the object.
@@ -1890,12 +1891,14 @@ class DefaultObject(ObjectDB, metaclass=TypeclassBase):
         """
         pass
 
-    def at_post_puppet(self, **kwargs):
+    def at_post_puppet(self, account, session=None, **kwargs):
         """
         Called just after puppeting has been completed and all
         Account<->Object links have been established.
 
         Args:
+            account (DefaultAccount): This is the connecting account.
+            session (Session): Session controlling the connection.
             **kwargs: Arbitrary, optional arguments for users
                 overriding the call (unused by default).
         Notes:
@@ -1907,12 +1910,17 @@ class DefaultObject(ObjectDB, metaclass=TypeclassBase):
         self.msg(f"You become |w{self.key}|n.")
         self.account.db._last_puppet = self
 
-    def at_pre_unpuppet(self, **kwargs):
+    def at_pre_unpuppet(self, account=None, session=None, **kwargs):
         """
         Called just before beginning to un-connect a puppeting from
         this Account.
 
         Args:
+            account (DefaultAccount): The account object that just disconnected
+                from this object. This can be `None` if this is called
+                automatically (such as after a cleanup operation).
+            session (Session): Session id controlling the connection that
+                just disconnected.
             **kwargs: Arbitrary, optional arguments for users
                 overriding the call (unused by default).
         Notes:
@@ -2413,7 +2421,7 @@ class DefaultObject(ObjectDB, metaclass=TypeclassBase):
 
         return {"exits": exit_names, "characters": character_names, "things": thing_names}
 
-    def at_look(self, target, **kwargs):
+    def at_look(self, target, session=None, **kwargs):
         """
         Called when this object performs a look. It allows to
         customize just what this means. It will not itself
@@ -2423,10 +2431,14 @@ class DefaultObject(ObjectDB, metaclass=TypeclassBase):
             target (DefaultObject): The target being looked at. This is
                 commonly an object or the current location. It will
                 be checked for the "view" type access.
+            session (Session, optional): The session doing this look.
             **kwargs: Arbitrary, optional arguments for users
                 overriding the call. This will be passed into
-                return_appearance, get_display_name and at_desc but is not used
-                by default.
+                return_appearance, get_display_name and at_desc.
+
+                Default Evennia commands will provide a session argument
+                so that information about the client (such as screen size)
+                can be used for formatting text.
 
         Returns:
             str: A ready-processed look string potentially ready to return to the looker.
@@ -2434,24 +2446,25 @@ class DefaultObject(ObjectDB, metaclass=TypeclassBase):
         """
         if not target.access(self, "view"):
             try:
-                return "Could not view '%s'." % target.get_display_name(self, **kwargs)
+                return "Could not view '%s'." % target.get_display_name(self, session=session, **kwargs)
             except AttributeError:
                 return "Could not view '%s'." % target.key
 
-        description = target.return_appearance(self, **kwargs)
+        description = target.return_appearance(self, session=session, **kwargs)
 
         # the target's at_desc() method.
         # this must be the last reference to target so it may delete itself when acted on.
-        target.at_desc(looker=self, **kwargs)
+        target.at_desc(looker=self, session=session, **kwargs)
 
         return description
 
-    def at_desc(self, looker=None, **kwargs):
+    def at_desc(self, looker=None, session=None, **kwargs):
         """
         This is called whenever someone looks at this object.
 
         Args:
             looker (Object, optional): The object requesting the description.
+            session (Session, optional): The session doing this look.
             **kwargs: Arbitrary, optional arguments for users
                 overriding the call (unused by default).
 
@@ -2974,7 +2987,7 @@ class DefaultCharacter(DefaultObject):
 
         """
         if self.location.access(self, "view"):
-            self.msg(text=(self.at_look(self.location), {"type": "look"}))
+            self.msg(text=(self.at_look(self.location, **kwargs), {"type": "look"}))
 
     # deprecated
     at_after_move = at_post_move
@@ -3002,14 +3015,16 @@ class DefaultCharacter(DefaultObject):
                 _("|r{obj} has no location and no home is set.|n").format(obj=self), session=session
             )
 
-    def at_post_puppet(self, **kwargs):
+    def at_post_puppet(self, account, session=None, **kwargs):
         """
         Called just after puppeting has been completed and all
         Account<->Object links have been established.
 
         Args:
+            account (DefaultAccount): This is the connecting account.
+            session (Session): Session controlling the connection.
             **kwargs (dict): Arbitrary, optional arguments for users
-                overriding the call (unused by default).
+                overriding the call
         Notes:
 
             You can use `self.account` and `self.sessions.get()` to get
@@ -3019,11 +3034,11 @@ class DefaultCharacter(DefaultObject):
 
         """
         self.msg(_("\nYou become |c{name}|n.\n").format(name=self.key))
-        self.msg((self.at_look(self.location), {"type": "look"}), options=None)
+        self.msg((self.at_look(self.location, session=session, **kwargs), {"type": "look"}), options=None)
 
         def message(obj, from_obj):
             obj.msg(
-                _("{name} has entered the game.").format(name=self.get_display_name(obj)),
+                _("{name} has entered the game.").format(name=self.get_display_name(obj, session=session, **kwargs)),
                 from_obj=from_obj,
             )
 
@@ -3194,8 +3209,8 @@ class DefaultRoom(DefaultObject):
             ";".join(["get:false()", "puppet:false()", "teleport:false()", "teleport_here:true()"])
         )  # would be weird to puppet a room ...
         self.location = None
-
-
+#
+#
 #
 # Default Exit command, used by the base exit object
 #

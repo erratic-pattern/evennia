@@ -823,7 +823,7 @@ class TestGroupObjectsByKeyAndDesc(TestCase):
             self.key = key
             self.desc = desc
 
-        def get_display_name(self, looker, **kwargs):
+        def get_display_name(self, looker, session=None, **kwargs):
             return self.key + f" (looker: {looker.key})"
 
         def get_display_desc(self, looker, **kwargs):

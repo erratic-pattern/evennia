@@ -367,13 +367,14 @@ class XYZRoom(DefaultRoom):
 
         return DefaultRoom.create(key, account=account, tags=tags, typeclass=cls, **kwargs)
 
-    def get_display_name(self, looker, **kwargs):
+    def get_display_name(self, looker, session=None, **kwargs):
         """
         Shows both the #dbref and the xyz coord to staff.
 
         Args:
             looker (TypedObject): The object or account that is looking
                 at/getting inforamtion for this object.
+            session (Session, optional): The session that will see this name
 
         Returns:
             name (str): A string containing the name of the object,

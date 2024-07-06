@@ -87,7 +87,7 @@ class CmdLook(COMMAND_DEFAULT_CLASS):
             target = caller.search(self.args)
             if not target:
                 return
-        desc = caller.at_look(target)
+        desc = caller.at_look(target, session=self.session)
         # add the type=look to the outputfunc to make it
         # easy to separate this output in client.
         self.msg(text=(desc, {"type": "look"}), options=None)
@@ -603,11 +603,11 @@ class CmdGive(NumberedTargetCommand):
                 obj.at_give(caller, target)
 
         if not moved:
-            caller.msg(f"You could not give that to {target.get_display_name(caller)}.")
+            caller.msg(f"You could not give that to {target.get_display_name(caller, session=self.session)}.")
         else:
             obj_name = to_give[0].get_numbered_name(len(moved), caller, return_string=True)
-            caller.msg(f"You give {obj_name} to {target.get_display_name(caller)}.")
-            target.msg(f"{caller.get_display_name(target)} gives you {obj_name}.")
+            caller.msg(f"You give {obj_name} to {target.get_display_name(caller. session=self.session)}.")
+            target.msg(f"{caller.get_display_name(target, session=self.session)} gives you {obj_name}.")
 
 
 class CmdSetDesc(COMMAND_DEFAULT_CLASS):

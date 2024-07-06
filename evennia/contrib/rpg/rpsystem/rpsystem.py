@@ -1375,13 +1375,14 @@ class ContribRPObject(DefaultObject):
         # return formatted string, or sdesc as fallback
         return f"{sdesc} {pose}" if pose else sdesc
 
-    def get_display_name(self, looker, **kwargs):
+    def get_display_name(self, looker, session=None, **kwargs):
         """
         Displays the name of the object in a viewer-aware manner.
 
         Args:
             looker (TypedObject): The object or account that is looking
                 at/getting inforamtion for this object.
+            session (Session, optional): The session that will see this name
 
         Keyword Args:
             pose (bool): Include the pose (if available) in the return.
@@ -1503,13 +1504,14 @@ class ContribRPCharacter(DefaultCharacter, ContribRPObject):
     def recog(self):
         return RecogHandler(self)
 
-    def get_display_name(self, looker, **kwargs):
+    def get_display_name(self, looker, session=None, **kwargs):
         """
         Displays the name of the object in a viewer-aware manner.
 
         Args:
             looker (TypedObject): The object or account that is looking
                 at/getting inforamtion for this object.
+            session (Session, optional): The session that will see this name
 
         Keyword Args:
             pose (bool): Include the pose (if available) in the return.

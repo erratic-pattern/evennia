@@ -397,7 +397,7 @@ class _DummyObj:
     def __init__(self, name):
         self.name = name
 
-    def get_display_name(self, looker=None):
+    def get_display_name(self, looker=None, session=None):
         return self.name
 
 
